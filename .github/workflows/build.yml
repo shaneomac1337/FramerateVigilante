@@ -28,21 +28,30 @@ jobs:
     - name: Download and setup plugin-sdk
       if: steps.cache-plugin-sdk.outputs.cache-hit != 'true'
       run: |
-        git clone --recurse-submodules https://github.com/DK22Pac/plugin-sdk.git C:\plugin-sdk
+        git clone https://github.com/DK22Pac/plugin-sdk.git C:\plugin-sdk
         cd C:\plugin-sdk
-        # Initialize submodules (safetyhook, etc.)
-        git submodule update --init --recursive
+        Write-Host "Initializing submodules..."
+        git submodule init
+        git submodule update --recursive
+        Write-Host "Submodule status:"
+        git submodule status --recursive
 
     - name: Set PLUGIN_SDK_DIR
       run: echo "PLUGIN_SDK_DIR=C:\plugin-sdk" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-    - name: Verify submodules
+    - name: Verify submodules and dependencies
       run: |
         cd C:\plugin-sdk
-        Write-Host "Checking submodules..."
-        git submodule status
-        Write-Host "Listing safetyhook directory..."
-        Get-ChildItem safetyhook -Recurse -Directory | Select-Object FullName
+        Write-Host "=== Submodule status ==="
+        git submodule status --recursive
+        Write-Host "`n=== Safetyhook contents ==="
+        if (Test-Path "safetyhook") {
+          Get-ChildItem safetyhook | Select-Object Name, Mode
+          Write-Host "`n=== Looking for 'expected' header ==="
+          Get-ChildItem safetyhook -Recurse -Filter "*expected*" | Select-Object FullName
+        } else {
+          Write-Host "ERROR: safetyhook directory not found!"
+        }
 
     - name: Build GTA Vice City version
       run: msbuild FramerateVigilante.sln /p:Configuration="GTAVC Release" /p:Platform=x86 /v:minimal

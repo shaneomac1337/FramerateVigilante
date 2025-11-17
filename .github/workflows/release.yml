@@ -26,10 +26,13 @@ jobs:
     - name: Download and setup plugin-sdk
       if: steps.cache-plugin-sdk.outputs.cache-hit != 'true'
       run: |
-        git clone --recurse-submodules https://github.com/DK22Pac/plugin-sdk.git C:\plugin-sdk
+        git clone https://github.com/DK22Pac/plugin-sdk.git C:\plugin-sdk
         cd C:\plugin-sdk
-        # Initialize submodules (safetyhook, etc.)
-        git submodule update --init --recursive
+        Write-Host "Initializing submodules..."
+        git submodule init
+        git submodule update --recursive
+        Write-Host "Submodule status:"
+        git submodule status --recursive
 
     - name: Set PLUGIN_SDK_DIR
       run: echo "PLUGIN_SDK_DIR=C:\plugin-sdk" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append

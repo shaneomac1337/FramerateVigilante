@@ -34,20 +34,15 @@ jobs:
     - name: Set PLUGIN_SDK_DIR
       run: echo "PLUGIN_SDK_DIR=C:\plugin-sdk" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-    - name: Build all versions
-      run: |
-        msbuild FramerateVigilante.sln /p:Configuration="GTASA Release" /p:Platform=x86 /v:minimal
-        msbuild FramerateVigilante.sln /p:Configuration="GTAVC Release" /p:Platform=x86 /v:minimal
-        msbuild FramerateVigilante.sln /p:Configuration="GTA3 Release" /p:Platform=x86 /v:minimal
+    - name: Build GTA Vice City version
+      run: msbuild FramerateVigilante.sln /p:Configuration="GTAVC Release" /p:Platform=x86 /v:minimal
       env:
         PLUGIN_SDK_DIR: C:\plugin-sdk
 
     - name: Prepare release package
       run: |
         mkdir FramerateVigilante
-        Copy-Item bin\GTASA\Release\FramerateVigilante.SA.asi FramerateVigilante\
         Copy-Item bin\GTAVC\Release\FramerateVigilante.VC.asi FramerateVigilante\
-        Copy-Item bin\GTA3\Release\FramerateVigilante.III.asi FramerateVigilante\
         Copy-Item FramerateVigilante.ini FramerateVigilante\
         Copy-Item README.md FramerateVigilante\
         Copy-Item LICENSE FramerateVigilante\
@@ -60,21 +55,24 @@ jobs:
         body: |
           ## FramerateVigilante ${{ github.ref_name }}
 
-          Fixes framerate-dependent bugs in GTA III, Vice City, and San Andreas.
+          Fixes framerate-dependent bugs in GTA Vice City.
 
           ### Included files:
-          - `FramerateVigilante.SA.asi` - GTA San Andreas
           - `FramerateVigilante.VC.asi` - GTA Vice City
-          - `FramerateVigilante.III.asi` - GTA III
           - `FramerateVigilante.ini` - Configuration file
 
           ### Installation:
           1. Install a mod loader (e.g., modloader, ASI Loader)
-          2. Copy the appropriate .asi file to your game directory
+          2. Copy `FramerateVigilante.VC.asi` to your GTA Vice City directory
           3. (Optional) Edit FramerateVigilante.ini to configure settings
 
           ### Linux/Proton users:
           The siren fix has been improved for Proton compatibility. If you still experience crashes, set `EnableSirenFix = 0` in the INI file.
+
+          ### Changes in this release:
+          - Fixed crash at 0x00597a5d in SirenTurnOnFix (Linux/Proton)
+          - Rewrote siren fix to use proper assembly jumps instead of stack manipulation
+          - Added EnableSirenFix config option for compatibility
         draft: false
         prerelease: false
       env:

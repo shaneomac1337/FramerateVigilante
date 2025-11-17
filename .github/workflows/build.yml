@@ -36,18 +36,16 @@ jobs:
     - name: Set PLUGIN_SDK_DIR
       run: echo "PLUGIN_SDK_DIR=C:\plugin-sdk" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-    - name: Build GTA San Andreas version
-      run: msbuild FramerateVigilante.sln /p:Configuration="GTASA Release" /p:Platform=x86 /v:minimal
-      env:
-        PLUGIN_SDK_DIR: C:\plugin-sdk
+    - name: Verify submodules
+      run: |
+        cd C:\plugin-sdk
+        Write-Host "Checking submodules..."
+        git submodule status
+        Write-Host "Listing safetyhook directory..."
+        Get-ChildItem safetyhook -Recurse -Directory | Select-Object FullName
 
     - name: Build GTA Vice City version
       run: msbuild FramerateVigilante.sln /p:Configuration="GTAVC Release" /p:Platform=x86 /v:minimal
-      env:
-        PLUGIN_SDK_DIR: C:\plugin-sdk
-
-    - name: Build GTA III version
-      run: msbuild FramerateVigilante.sln /p:Configuration="GTA3 Release" /p:Platform=x86 /v:minimal
       env:
         PLUGIN_SDK_DIR: C:\plugin-sdk
 
@@ -55,9 +53,7 @@ jobs:
       run: |
         mkdir release
         # Copy the built files from bin directories
-        Copy-Item bin\GTASA\Release\FramerateVigilante.SA.asi release\
         Copy-Item bin\GTAVC\Release\FramerateVigilante.VC.asi release\
-        Copy-Item bin\GTA3\Release\FramerateVigilante.III.asi release\
         Copy-Item FramerateVigilante.ini release\
         Copy-Item README.md release\
         Copy-Item LICENSE release\

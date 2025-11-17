@@ -53,7 +53,9 @@ jobs:
     - name: Prepare release package
       run: |
         mkdir FramerateVigilante
-        Get-ChildItem -Path . -Filter "FramerateVigilante.*.asi" -Recurse | Copy-Item -Destination FramerateVigilante\
+        Copy-Item bin\GTASA\Release\FramerateVigilante.SA.asi FramerateVigilante\
+        Copy-Item bin\GTAVC\Release\FramerateVigilante.VC.asi FramerateVigilante\
+        Copy-Item bin\GTA3\Release\FramerateVigilante.III.asi FramerateVigilante\
         Copy-Item FramerateVigilante.ini FramerateVigilante\
         Copy-Item README.md FramerateVigilante\
         Copy-Item LICENSE FramerateVigilante\

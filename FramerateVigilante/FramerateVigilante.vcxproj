@@ -96,37 +96,37 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">
-    <OutDir>G:\GTA San Andreas Remaster\modloader\_ESSENTIALS\FramerateVigilante</OutDir>
+    <OutDir>$(SolutionDir)bin\GTASA\Release\</OutDir>
     <IntDir>$(ProjectDir).obj\GTASA\Release\</IntDir>
     <TargetName>FramerateVigilante.SA</TargetName>
     <TargetExt>.asi</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GTASA zDebug|Win32'">
-    <OutDir>G:\GTA San Andreas Remaster\modloader\_ESSENTIALS\FramerateVigilante</OutDir>
+    <OutDir>$(SolutionDir)bin\GTASA\Debug\</OutDir>
     <IntDir>$(ProjectDir).obj\GTASA\Debug\</IntDir>
     <TargetName>FramerateVigilante.SA</TargetName>
     <TargetExt>.asi</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GTAVC Release|Win32'">
-    <OutDir>E:\Documents\GTA Vice City\</OutDir>
+    <OutDir>$(SolutionDir)bin\GTAVC\Release\</OutDir>
     <IntDir>$(ProjectDir).obj\GTAVC\Release\</IntDir>
     <TargetName>FramerateVigilante.VC</TargetName>
     <TargetExt>.asi</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GTAVC zDebug|Win32'">
-    <OutDir>E:\Documents\GTA Vice City\</OutDir>
+    <OutDir>$(SolutionDir)bin\GTAVC\Debug\</OutDir>
     <IntDir>$(ProjectDir).obj\GTAVC\Debug\</IntDir>
     <TargetName>FramerateVigilante.VC</TargetName>
     <TargetExt>.asi</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GTA3 Release|Win32'">
-    <OutDir>E:\Documents\Grand Theft Auto III\</OutDir>
+    <OutDir>$(SolutionDir)bin\GTA3\Release\</OutDir>
     <IntDir>$(ProjectDir).obj\GTA3\Release\</IntDir>
     <TargetName>FramerateVigilante.III</TargetName>
     <TargetExt>.asi</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GTA3 zDebug|Win32'">
-    <OutDir>E:\Documents\Grand Theft Auto III\</OutDir>
+    <OutDir>$(SolutionDir)bin\GTA3\Debug\</OutDir>
     <IntDir>$(ProjectDir).obj\GTA3\Debug\</IntDir>
     <TargetName>FramerateVigilante.III</TargetName>
     <TargetExt>.asi</TargetExt>

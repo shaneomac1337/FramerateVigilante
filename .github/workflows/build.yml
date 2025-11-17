@@ -62,8 +62,10 @@ jobs:
     - name: Prepare artifacts
       run: |
         mkdir release
-        # Find and copy the built files
-        Get-ChildItem -Path . -Filter "FramerateVigilante.*.asi" -Recurse | Copy-Item -Destination release\
+        # Copy the built files from bin directories
+        Copy-Item bin\GTASA\Release\FramerateVigilante.SA.asi release\
+        Copy-Item bin\GTAVC\Release\FramerateVigilante.VC.asi release\
+        Copy-Item bin\GTA3\Release\FramerateVigilante.III.asi release\
         Copy-Item FramerateVigilante.ini release\
         Copy-Item README.md release\
         Copy-Item LICENSE release\

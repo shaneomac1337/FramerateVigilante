@@ -25,6 +25,7 @@ public:
 	static inline int _lastFpsLimit;
 	static inline int _refreshRate;
 	static inline bool _autoLimitFPS;
+	static inline bool _enableSirenFix;
 
 	union {
 		int _isOnFlagsInt;
@@ -109,6 +110,13 @@ public:
 		#if defined(GTASA)
 
 			_autoLimitFPS = ini.ReadInteger("Settings", "AutoLimitFPS", 0);
+
+		#endif
+
+			// Siren fix - can cause crashes on Linux/Proton, disable if needed
+			_enableSirenFix = ini.ReadInteger("Settings", "EnableSirenFix", 1);
+
+		#if defined(GTASA)
 
 
 			struct AimingRifleWalkFix
@@ -196,7 +204,7 @@ public:
 					asm_fld(f);
 				}
 			}; MakeInline<SkimmerResistanceFixVC>(0x59FB69, 0x59FB69 + 6);
-		#endif defined(GTAVC)
+		#endif // defined(GTAVC)
 
 
 		#if defined(GTASA)
@@ -242,11 +250,11 @@ public:
 			// CarWheelOnRailsSpinFix III VC
 		#if defined(GTA3)
 			MakeInline<MagicTimeStepFMUL>(0x5512D2, 0x5512D2 + 6);
-		#endif defined(GTA3)
+		#endif // defined(GTA3)
 
 		#if defined(GTAVC)
 			MakeInline<MagicTimeStepFMUL>(0x5BA952, 0x5BA952 + 6);
-		#endif defined(GTAVC)
+		#endif // defined(GTAVC)
 
 
 			struct CarSlowDownSpeedFix
@@ -319,58 +327,55 @@ public:
 					if (!pad->GetHorn()) { hornJustUp = hornHasPressed ? true : false; }
 					else { hornJustUp = false; }
 
-					// Select final mode
-					uint32_t returnAddress;
+					// Select final mode and jump directly
 					if (pad->GetHorn() && CTimer::m_snTimeInMilliseconds - hornPressLastTime >= 150) {
-						// horn return
+						// horn - jump directly instead of manipulating stack
 					#if defined(GTASA)
-						returnAddress = 0x6E09E8;
+						_asm { push 0x6E09E8 }
+						_asm { ret }
 					#endif
 					#if defined(GTAVC)
-						returnAddress = 0x597B39;
+						_asm { push 0x597B39 }
+						_asm { ret }
 					#endif
 					#if defined(GTA3)
-						returnAddress = 0x534169;
+						_asm { push 0x534169 }
+						_asm { ret }
 					#endif
 					}
 					else if (hornJustUp && CTimer::m_snTimeInMilliseconds - hornPressLastTime < 150) {
 						hornJustUp = false;
 						hornHasPressed = false;
-						// toggle siren return
+						// toggle siren - jump directly
 					#if defined(GTASA)
-						returnAddress = 0x6E0999;
+						_asm { push 0x6E0999 }
+						_asm { ret }
 					#endif
 					#if defined(GTAVC)
-						returnAddress = 0x597AB5;
+						_asm { push 0x597AB5 }
+						_asm { ret }
 					#endif
 					#if defined(GTA3)
-						returnAddress = 0x5340EB;
+						_asm { push 0x5340EB }
+						_asm { ret }
 					#endif
 					}
-					else {
-						// no horn return
-					#if defined(GTASA)
-						returnAddress = 0x6E09F7;
-					#endif
-					#if defined(GTAVC)
-						returnAddress = 0x597AE0;
-					#endif
-					#if defined(GTA3)
-						returnAddress = 0x534113;
-					#endif
-					}
-					*(uint32_t*)(regs.esp - 0x4) = returnAddress;
+					// no horn - fall through to normal return
 				}
 			};
+
+			if (_enableSirenFix)
+			{
 		#if defined(GTASA)
-			MakeInline<SirenTurnOnFix>(0x006E0961);
+				MakeInline<SirenTurnOnFix>(0x006E0961);
 		#endif
 		#if defined(GTAVC)
-			MakeInline<SirenTurnOnFix>(0x00597A58);
+				MakeInline<SirenTurnOnFix>(0x00597A58);
 		#endif
 		#if defined(GTA3)
-			MakeInline<SirenTurnOnFix>(0x00534092);
+				MakeInline<SirenTurnOnFix>(0x00534092);
 		#endif
+			}
 
 
 		#if defined(GTASA)

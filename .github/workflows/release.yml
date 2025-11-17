@@ -1,0 +1,84 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on version tags like v1.0, v2.1, etc.
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Cache plugin-sdk
+      id: cache-plugin-sdk
+      uses: actions/cache@v3
+      with:
+        path: C:\plugin-sdk
+        key: plugin-sdk-${{ runner.os }}-v1
+
+    - name: Download plugin-sdk
+      if: steps.cache-plugin-sdk.outputs.cache-hit != 'true'
+      run: |
+        git clone --depth 1 https://github.com/DK22Pac/plugin-sdk.git C:\plugin-sdk
+
+    - name: Build plugin-sdk libraries
+      if: steps.cache-plugin-sdk.outputs.cache-hit != 'true'
+      run: |
+        cd C:\plugin-sdk
+        msbuild plugin_sa\plugin_sa.vcxproj /p:Configuration=Release /p:Platform=Win32
+        msbuild plugin_vc\plugin_vc.vcxproj /p:Configuration=Release /p:Platform=Win32
+        msbuild plugin_III\plugin_III.vcxproj /p:Configuration=Release /p:Platform=Win32
+
+    - name: Set PLUGIN_SDK_DIR
+      run: echo "PLUGIN_SDK_DIR=C:\plugin-sdk" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+    - name: Build all versions
+      run: |
+        msbuild FramerateVigilante.sln /p:Configuration="GTASA Release" /p:Platform=Win32 /v:minimal
+        msbuild FramerateVigilante.sln /p:Configuration="GTAVC Release" /p:Platform=Win32 /v:minimal
+        msbuild FramerateVigilante.sln /p:Configuration="GTA3 Release" /p:Platform=Win32 /v:minimal
+      env:
+        PLUGIN_SDK_DIR: C:\plugin-sdk
+
+    - name: Prepare release package
+      run: |
+        mkdir FramerateVigilante
+        Get-ChildItem -Path . -Filter "FramerateVigilante.*.asi" -Recurse | Copy-Item -Destination FramerateVigilante\
+        Copy-Item FramerateVigilante.ini FramerateVigilante\
+        Copy-Item README.md FramerateVigilante\
+        Copy-Item LICENSE FramerateVigilante\
+        Compress-Archive -Path FramerateVigilante -DestinationPath FramerateVigilante-${{ github.ref_name }}.zip
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: FramerateVigilante-${{ github.ref_name }}.zip
+        body: |
+          ## FramerateVigilante ${{ github.ref_name }}
+
+          Fixes framerate-dependent bugs in GTA III, Vice City, and San Andreas.
+
+          ### Included files:
+          - `FramerateVigilante.SA.asi` - GTA San Andreas
+          - `FramerateVigilante.VC.asi` - GTA Vice City
+          - `FramerateVigilante.III.asi` - GTA III
+          - `FramerateVigilante.ini` - Configuration file
+
+          ### Installation:
+          1. Install a mod loader (e.g., modloader, ASI Loader)
+          2. Copy the appropriate .asi file to your game directory
+          3. (Optional) Edit FramerateVigilante.ini to configure settings
+
+          ### Linux/Proton users:
+          The siren fix has been improved for Proton compatibility. If you still experience crashes, set `EnableSirenFix = 0` in the INI file.
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,73 @@
+name: Build FramerateVigilante
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Cache plugin-sdk
+      id: cache-plugin-sdk
+      uses: actions/cache@v3
+      with:
+        path: C:\plugin-sdk
+        key: plugin-sdk-${{ runner.os }}-v1
+
+    - name: Download plugin-sdk
+      if: steps.cache-plugin-sdk.outputs.cache-hit != 'true'
+      run: |
+        git clone --depth 1 https://github.com/DK22Pac/plugin-sdk.git C:\plugin-sdk
+
+    - name: Build plugin-sdk libraries
+      if: steps.cache-plugin-sdk.outputs.cache-hit != 'true'
+      run: |
+        cd C:\plugin-sdk
+        msbuild plugin_sa\plugin_sa.vcxproj /p:Configuration=Release /p:Platform=Win32
+        msbuild plugin_vc\plugin_vc.vcxproj /p:Configuration=Release /p:Platform=Win32
+        msbuild plugin_III\plugin_III.vcxproj /p:Configuration=Release /p:Platform=Win32
+
+    - name: Set PLUGIN_SDK_DIR
+      run: echo "PLUGIN_SDK_DIR=C:\plugin-sdk" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+    - name: Build GTA San Andreas version
+      run: msbuild FramerateVigilante.sln /p:Configuration="GTASA Release" /p:Platform=Win32 /v:minimal
+      env:
+        PLUGIN_SDK_DIR: C:\plugin-sdk
+
+    - name: Build GTA Vice City version
+      run: msbuild FramerateVigilante.sln /p:Configuration="GTAVC Release" /p:Platform=Win32 /v:minimal
+      env:
+        PLUGIN_SDK_DIR: C:\plugin-sdk
+
+    - name: Build GTA III version
+      run: msbuild FramerateVigilante.sln /p:Configuration="GTA3 Release" /p:Platform=Win32 /v:minimal
+      env:
+        PLUGIN_SDK_DIR: C:\plugin-sdk
+
+    - name: Prepare artifacts
+      run: |
+        mkdir release
+        # Find and copy the built files
+        Get-ChildItem -Path . -Filter "FramerateVigilante.*.asi" -Recurse | Copy-Item -Destination release\
+        Copy-Item FramerateVigilante.ini release\
+        Copy-Item README.md release\
+        Copy-Item LICENSE release\
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: FramerateVigilante-Build
+        path: release/
+        if-no-files-found: error

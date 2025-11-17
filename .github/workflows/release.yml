@@ -34,6 +34,15 @@ jobs:
         Write-Host "Submodule status:"
         git submodule status --recursive
 
+        # Download tl::expected header for safetyhook
+        Write-Host "Downloading tl::expected library..."
+        $expectedDir = "safetyhook\tl-expected"
+        New-Item -ItemType Directory -Force -Path $expectedDir | Out-Null
+        Invoke-WebRequest -Uri "https://raw.githubusercontent.com/TartanLlama/expected/master/include/tl/expected.hpp" -OutFile "$expectedDir\expected.hpp"
+
+        # Create a wrapper expected header
+        Set-Content -Path "safetyhook\expected" -Value "#include `"tl-expected/expected.hpp`"`nnamespace std { using tl::expected; using tl::unexpected; }"
+
     - name: Set PLUGIN_SDK_DIR
       run: echo "PLUGIN_SDK_DIR=C:\plugin-sdk" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 

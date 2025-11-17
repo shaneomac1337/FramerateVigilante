@@ -43,6 +43,10 @@ jobs:
         # Create a wrapper expected header
         Set-Content -Path "safetyhook\expected" -Value "#include `"tl-expected/expected.hpp`"`nnamespace std { using tl::expected; using tl::unexpected; }"
 
+        # Patch safetyhook.hpp to use local expected header instead of system header
+        (Get-Content "safetyhook\safetyhook.hpp") -replace '#include <expected>', '#include "expected"' | Set-Content "safetyhook\safetyhook.hpp"
+        Write-Host "Patched safetyhook.hpp to use local expected header"
+
     - name: Set PLUGIN_SDK_DIR
       run: echo "PLUGIN_SDK_DIR=C:\plugin-sdk" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 

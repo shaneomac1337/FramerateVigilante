@@ -45,17 +45,17 @@ jobs:
       run: echo "PLUGIN_SDK_DIR=C:\plugin-sdk" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Build GTA San Andreas version
-      run: msbuild FramerateVigilante.sln /p:Configuration="GTASA Release" /p:Platform=Win32 /v:minimal
+      run: msbuild FramerateVigilante.sln /p:Configuration="GTASA Release" /p:Platform=x86 /v:minimal
       env:
         PLUGIN_SDK_DIR: C:\plugin-sdk
 
     - name: Build GTA Vice City version
-      run: msbuild FramerateVigilante.sln /p:Configuration="GTAVC Release" /p:Platform=Win32 /v:minimal
+      run: msbuild FramerateVigilante.sln /p:Configuration="GTAVC Release" /p:Platform=x86 /v:minimal
       env:
         PLUGIN_SDK_DIR: C:\plugin-sdk
 
     - name: Build GTA III version
-      run: msbuild FramerateVigilante.sln /p:Configuration="GTA3 Release" /p:Platform=Win32 /v:minimal
+      run: msbuild FramerateVigilante.sln /p:Configuration="GTA3 Release" /p:Platform=x86 /v:minimal
       env:
         PLUGIN_SDK_DIR: C:\plugin-sdk
 

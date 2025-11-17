@@ -44,9 +44,9 @@ jobs:
 
     - name: Build all versions
       run: |
-        msbuild FramerateVigilante.sln /p:Configuration="GTASA Release" /p:Platform=Win32 /v:minimal
-        msbuild FramerateVigilante.sln /p:Configuration="GTAVC Release" /p:Platform=Win32 /v:minimal
-        msbuild FramerateVigilante.sln /p:Configuration="GTA3 Release" /p:Platform=Win32 /v:minimal
+        msbuild FramerateVigilante.sln /p:Configuration="GTASA Release" /p:Platform=x86 /v:minimal
+        msbuild FramerateVigilante.sln /p:Configuration="GTAVC Release" /p:Platform=x86 /v:minimal
+        msbuild FramerateVigilante.sln /p:Configuration="GTA3 Release" /p:Platform=x86 /v:minimal
       env:
         PLUGIN_SDK_DIR: C:\plugin-sdk
 

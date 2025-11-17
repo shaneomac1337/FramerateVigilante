@@ -32,9 +32,7 @@ jobs:
       if: steps.cache-plugin-sdk.outputs.cache-hit != 'true'
       run: |
         cd C:\plugin-sdk
-        msbuild plugin_sa\plugin_sa.vcxproj /p:Configuration=Release /p:Platform=Win32
-        msbuild plugin_vc\plugin_vc.vcxproj /p:Configuration=Release /p:Platform=Win32
-        msbuild plugin_III\plugin_III.vcxproj /p:Configuration=Release /p:Platform=Win32
+        msbuild plugin-sdk.sln /p:Configuration=Release /p:Platform=Win32 /v:minimal /m
 
     - name: Set PLUGIN_SDK_DIR
       run: echo "PLUGIN_SDK_DIR=C:\plugin-sdk" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append

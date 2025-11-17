@@ -23,16 +23,21 @@ jobs:
         path: C:\plugin-sdk
         key: plugin-sdk-${{ runner.os }}-v1
 
-    - name: Download plugin-sdk
+    - name: Download and setup plugin-sdk
       if: steps.cache-plugin-sdk.outputs.cache-hit != 'true'
       run: |
         git clone --depth 1 https://github.com/DK22Pac/plugin-sdk.git C:\plugin-sdk
-
-    - name: Build plugin-sdk libraries
-      if: steps.cache-plugin-sdk.outputs.cache-hit != 'true'
-      run: |
         cd C:\plugin-sdk
-        msbuild plugin-sdk.sln /p:Configuration=Release /p:Platform=Win32 /v:minimal /m
+        # Build libraries for all three games
+        if (Test-Path "plugin_sa/plugin_sa.sln") {
+          msbuild plugin_sa/plugin_sa.sln /p:Configuration=Release /p:Platform=Win32 /v:minimal
+        }
+        if (Test-Path "plugin_vc/plugin_vc.sln") {
+          msbuild plugin_vc/plugin_vc.sln /p:Configuration=Release /p:Platform=Win32 /v:minimal
+        }
+        if (Test-Path "plugin_III/plugin_III.sln") {
+          msbuild plugin_III/plugin_III.sln /p:Configuration=Release /p:Platform=Win32 /v:minimal
+        }
 
     - name: Set PLUGIN_SDK_DIR
       run: echo "PLUGIN_SDK_DIR=C:\plugin-sdk" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
